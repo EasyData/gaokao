@@ -97,6 +97,7 @@ class EolDaxueZhuanyeItem(Item):
 
 class EolDaxueItem(Item):
 
+    url = Field()
     code = Field()
     code2 = Field()
     name = Field()
@@ -114,6 +115,14 @@ class EolDaxueItem(Item):
     rank = Field()
     rank2 = Field()
     home_url = Field()
+
+    logo = Field()
+    enroll_url = Field()
+    addr = Field()
+    phone = Field()
+    email = Field()
+    votes = Field()
+    image_urls = Field()
     time = Field()
 
 

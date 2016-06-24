@@ -139,12 +139,13 @@ class EolDaxueSpider(EolDaxueBaseSpider):
 
             badges = {
                 u'教育部直属': int(i['edudirectly']),
-                u'985大学': int(i['f985']),
-                u'211大学': int(i['f211']),
-                u'自主招生试点': int(i['autonomyrs']),
+                u'985高校': int(i['f985']),
+                u'211高校': int(i['f211']),
+                u'自主招生': int(i['autonomyrs']),
             }
 
-            yield EolDaxueItem(
+            item = EolDaxueItem(
+                url='http://gkcx.eol.cn/schoolhtm/schoolTemple/school{}.htm'.format(i['schoolid']),
                 code=i['schoolid'],
                 code2=i['schoolcode'] or '',
                 name=i['schoolname'],
@@ -164,6 +165,26 @@ class EolDaxueSpider(EolDaxueBaseSpider):
                 home_url=i['guanwang'] or '',
                 time=int(time.time()),
             )
+
+            yield Request(url=item['url'], meta={'item': item}, callback=self.parse_page)
+
+    def parse_page(self, response):
+
+        item = response.meta['item']
+        item['logo'] = response.css(u'.gkcx_main .w_150 img::attr(src)').extract_first()
+        item['enroll_url'] = response.xpath(u'//td[.="招生网址："]/following-sibling::td[1]/a/@title').extract_first()
+        item['addr'] = response.xpath(u'//td[.="通讯地址："]/following-sibling::td[1]/p/@title').extract_first()
+        item['phone'] = response.xpath(u'//td[.="招办电话："]/following-sibling::td[1]/p/@title').extract_first()
+        item['email'] = response.xpath(u'//td[.="电子邮箱："]/following-sibling::td[1]/p/@title').extract_first()
+        item['votes'] = {
+            'study': float(response.xpath(u'//td[.="学习指数："]/following-sibling::td[2]/text()').extract_first() or 0),
+            'life': float(response.xpath(u'//td[.="生活指数："]/following-sibling::td[2]/text()').extract_first() or 0),
+            'career': float(response.xpath(u'//td[.="就业指数："]/following-sibling::td[2]/text()').extract_first() or 0),
+        }
+        item['image_urls'] = [
+            urljoin(item['url'], url) for url in response.css(u'.img_200.left img::attr(src)').extract()
+        ]
+        return item
 
 
 class EolDaxueProvinceFenshuxianSpider(EolDaxueBaseSpider):

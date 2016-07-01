@@ -141,3 +141,20 @@ class EolDaxueZhuanyeFenshuxianItem(Item):
     score = Field()
     time = Field()
 
+class ChsiDaxueItem(Item):
+
+    id = Field()
+    url = Field()
+    logo = Field()
+    name = Field()
+    badges = Field()
+    type =Field()
+    membership = Field()
+    province = Field()
+    address = Field()
+    phone = Field()
+    website = Field()
+    backdoor = Field()
+    votes = Field()
+    trending = Field()
+    majors = Field()

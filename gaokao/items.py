@@ -157,4 +157,5 @@ class ChsiDaxueItem(Item):
     backdoor = Field()
     votes = Field()
     trending = Field()
+    intro =Field()
     majors = Field()

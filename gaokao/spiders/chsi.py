@@ -138,7 +138,15 @@ class ChsiDaxueSpider(CrawlSpider):
 
         item = loader.load_item()
 
-        for link in LinkExtractor(restrict_xpaths=u'//h3[contains(., "招生专业")]/span[@class="h3_span_more"]/a').extract_links(response):
+        for link in LinkExtractor(restrict_xpaths=u'//ul[@id="topNav"]//a[.="学校简介"]').extract_links(response):
+            yield Request(link.url, meta={'item': item}, callback=self.parse_jianjie)
+
+    def parse_jianjie(self, response):
+
+        item = response.meta['item']
+        item['intro'] = response.xpath(u'//div[@class="schInfoSubT" and a/@name="2"]/following-sibling::div[1]').extract_first()
+
+        for link in LinkExtractor(restrict_xpaths=u'//ul[@id="topNav"]//a[.="专业介绍"]').extract_links(response):
             yield Request(link.url, meta={'item': item}, callback=self.parse_zhuanye)
 
     def parse_zhuanye(self, response):
@@ -164,3 +172,4 @@ class ChsiDaxueSpider(CrawlSpider):
 
         item['majors'] = majors
         return item
+

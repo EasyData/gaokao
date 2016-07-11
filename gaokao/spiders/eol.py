@@ -6,11 +6,37 @@ import scrapy
 import time
 from scrapy.exceptions import CloseSpider
 from scrapy.http import Request
+from scrapy.linkextractors import LinkExtractor
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import TakeFirst, Compose, MapCompose, Join
+from scrapy.spiders import CrawlSpider, Rule
 from string import Template
 from urlparse import urljoin
 from gaokao.items import *
+
+
+class EolZhiyeSpider(CrawlSpider):
+
+    name = "eol_zhiye"
+    allowed_domains = ["career.eol.cn"]
+    start_urls = (
+        'http://career.eol.cn/html/sy/zhiye/',
+    )
+    rules = (
+        Rule(LinkExtractor(restrict_css=u'td[id^=sw1]')),
+        Rule(LinkExtractor(restrict_xpaths=u'//a[@class="blue01_14" and strong]'), callback='parse_item'),
+    )
+
+    def parse_item(self, response):
+
+        loader = ItemLoader(EolZhiyeItem(), response)
+        loader.add_value('url', response.url)
+        loader.add_value('code', response.url, re=r'/(\w+)\.shtml')
+        loader.add_css('name', 'h1#pagetitle::text')
+        loader.add_xpath('category', u'//div[@id="precontent"]/p[contains(., "行业")]/a/text()')
+        loader.add_xpath('category2', u'//div[@id="precontent"]/p[contains(., "职业")]/a/text()')
+        loader.add_xpath('detail', u'//div[@id="precontent"]/following-sibling::node()[not(self::table)]', Join('\n'))
+        yield loader.load_item()
 
 
 class EolZhuanyeSpider(scrapy.Spider):

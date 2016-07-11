@@ -72,9 +72,18 @@ class GaokaopaiZhiyeItem(Item):
     url = Field()
     code = Field()
     name = Field()
-
     category = Field()
     majors = Field()
+    detail = Field()
+
+
+class EolZhiyeItem(Item):
+
+    url = Field()
+    code = Field()
+    name = Field()
+    category = Field()
+    category2 = Field()
     detail = Field()
 
 

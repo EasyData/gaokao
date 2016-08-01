@@ -6,3 +6,4 @@ GaoKao
 - [x] chsi
 - [x] eol
 - [x] gaokaopai
+- [x] sina

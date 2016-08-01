@@ -168,3 +168,33 @@ class ChsiDaxueItem(Item):
     trending = Field()
     intro =Field()
     majors = Field()
+
+class SinaSchoolItem(Item):
+
+    tab = Field()
+    school = Field()
+    province = Field()
+    type = Field()
+    batch = Field()
+    year = Field()
+    score = Field()
+
+class SinaMajorItem(Item):
+
+    tab = Field()
+    major = Field()
+    school = Field()
+    score = Field()
+    province = Field()
+    type = Field()
+    batch = Field()
+    year = Field()
+
+class SinaBatchItem(Item):
+
+    tab = Field()
+    year = Field()
+    province = Field()
+    type = Field()
+    batch = Field()
+    score = Field()

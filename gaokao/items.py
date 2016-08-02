@@ -198,3 +198,11 @@ class SinaBatchItem(Item):
     type = Field()
     batch = Field()
     score = Field()
+
+class ShmecItem(Item):
+
+    province = Field()
+    school = Field()
+    major = Field()
+    require = Field()
+    remark = Field()

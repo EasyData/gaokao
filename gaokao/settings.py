@@ -10,6 +10,7 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'gaokao'
+LOG_LEVEL = 'INFO'
 
 SPIDER_MODULES = ['gaokao.spiders']
 NEWSPIDER_MODULE = 'gaokao.spiders'

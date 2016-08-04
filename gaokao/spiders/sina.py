@@ -14,8 +14,8 @@ class SinaSpider(scrapy.Spider):
     def start_requests(self):
 
         #for tab in ['school', 'major', 'batch']:
-        for tab in ['batch']:
-            for year in xrange(2013, 2016+1):
+        for tab in ['major']:
+            for year in xrange(2013, 2016):
                 for local in xrange(1, 32+1):
                     yield Request(
                         url=self.build_url(tab, year, local),

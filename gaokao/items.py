@@ -169,7 +169,7 @@ class ChsiDaxueItem(Item):
     intro =Field()
     majors = Field()
 
-class SinaSchoolItem(Item):
+class SinaCollegeItem(Item):
 
     tab = Field()
     school = Field()

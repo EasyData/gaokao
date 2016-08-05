@@ -6,28 +6,25 @@ from scrapy.linkextractors import LinkExtractor
 from gaokao.items import *
 
 
-class SinaSpider(scrapy.Spider):
+class SinaBaseSpider(scrapy.Spider):
 
-    name = 'sina'
     allowed_domains = ['kaoshi.edu.sina.com.cn']
+    years = xrange(2013, 2016)
 
     def start_requests(self):
 
-        #for tab in ['school', 'major', 'batch']:
-        for tab in ['major']:
-            for year in xrange(2013, 2016):
-                for local in xrange(1, 32+1):
-                    yield Request(
-                        url=self.build_url(tab, year, local),
-                        meta={'tab': tab, 'year': year, 'local': local},
-                    )
+        for year in self.years:
+            for local in xrange(1, 32+1):
+                yield Request(
+                    url=self.build_url(year, local),
+                    meta={'year': year, 'local': local},
+                )
 
     def parse(self, response):
 
         meta = response.meta
 
-        callback = getattr(self, 'parse_{}_item'.format(meta['tab']))
-        for item in callback(response):
+        for item in self.parse_item(response):
             yield item
 
         if meta.get('page', 1) == 1:
@@ -35,15 +32,31 @@ class SinaSpider(scrapy.Spider):
             max_page = int(response.css('.pageNumWrap::attr(totalpage)').extract_first())
             for page in xrange(2, max_page+1):
                 yield Request(
-                    url=self.build_url(meta['tab'], meta['year'], meta['local'], page),
-                    callback=callback,
+                    url=self.build_url(meta['year'], meta['local'], page),
+                    callback=self.parse_item,
                 )
 
-    def parse_school_item(self, response):
+    def parse_item(self, response):
+
+        raise NotImplementedError()
+
+    def build_url(self, year, local, page=1):
+
+        base_url = 'http://kaoshi.edu.sina.com.cn/college/scorelist?tab={}&syear={}&local={}&page={}'
+        tab = '' if self.tab == 'college' else self.tab
+        return base_url.format(tab, year, local, page)
+
+
+class SinaCollegeSpider(SinaBaseSpider):
+
+    name = 'sina_college'
+    tab = 'college'
+
+    def parse_item(self, response):
 
         for row in response.css('table.tbL2 tr:not(:first-child)'):
-            yield SinaSchoolItem(
-                tab='school',
+            yield SinaCollegeItem(
+                tab='college',
                 school=row.css('td:nth-child(1)>a::text').extract_first(),
                 province=row.css('td:nth-child(2)::text').extract_first(),
                 type=row.css('td:nth-child(3)::text').extract_first(),
@@ -55,7 +68,13 @@ class SinaSpider(scrapy.Spider):
                 }
             )
 
-    def parse_major_item(self, response):
+
+class SinaMajorSpider(SinaBaseSpider):
+
+    name = 'sina_major'
+    tab = 'major'
+
+    def parse_item(self, response):
 
         for row in response.css('table.tbL2 tr:not(:first-child)'):
             yield SinaMajorItem(
@@ -72,7 +91,14 @@ class SinaSpider(scrapy.Spider):
                 year=int(row.css('td:nth-child(8)::text').extract_first()),
             )
 
-    def parse_batch_item(self, response):
+
+class SinaBatchSpider(SinaBaseSpider):
+
+    name = 'sina_batch'
+    tab = 'batch'
+    years = xrange(2013, 2017)
+
+    def parse_item(self, response):
 
         for row in response.css('table.tbL2 tr:not(:first-child)'):
             yield SinaBatchItem(
@@ -83,10 +109,4 @@ class SinaSpider(scrapy.Spider):
                 batch=row.css('td:nth-child(4)::text').extract_first(),
                 score=int(row.css('td:nth-child(5)::text').extract_first()),
             )
-
-    def build_url(self, tab, year, local, page=1):
-
-        base_url = 'http://kaoshi.edu.sina.com.cn/college/scorelist?tab={}&syear={}&local={}&page={}'
-        tab = '' if tab == 'school' else tab
-        return base_url.format(tab, year, local, page)
 
